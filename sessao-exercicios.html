@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Treinamento - Adaptação e Hipertrofia</title>
+    <style>
+        :root {
+            --blue: #0d6efd;
+            --green: #198754;
+            --orange: #fd7e14;
+            --gray: #6c757d;
+            --red: #dc3545;
+            --bg: #f8f9fa;
+            --card-bg: #fff;
+            --text: #333;
+            --text-muted: #6c757d;
+            --border: #dee2e6;
+            --input-bg: #fff;
+            --badge-bg: #212529;
+            --warning-bg: #fff3cd;
+            --warning-border: #ffeeba;
+            --exercise-bg: #e9ecef;
+            --checked-bg: #d4edda;
+            --checked-border: #c3e6cb;
+            --progress-bg: #e9ecef;
+            --streak-gold: #ffc107;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #1a1d21;
+                --card-bg: #2b2f36;
+                --text: #e1e4e8;
+                --text-muted: #8b949e;
+                --border: #373b42;
+                --input-bg: #373b42;
+                --badge-bg: #0d6efd;
+                --warning-bg: #3d3522;
+                --warning-border: #665a2e;
+                --exercise-bg: #373b42;
+                --checked-bg: #1e3a2a;
+                --checked-border: #2d5a3e;
+                --progress-bg: #373b42;
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #1a1d21;
+            --card-bg: #2b2f36;
+            --text: #e1e4e8;
+            --text-muted: #8b949e;
+            --border: #373b42;
+            --input-bg: #373b42;
+            --badge-bg: #0d6efd;
+            --warning-bg: #3d3522;
+            --warning-border: #665a2e;
+            --exercise-bg: #373b42;
+            --checked-bg: #1e3a2a;
+            --checked-border: #2d5a3e;
+            --progress-bg: #373b42;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px;
+            background-color: var(--bg);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        .date-badge {
+            display: inline-block;
+            background-color: var(--badge-bg);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        .warning {
+            background-color: var(--warning-bg);
+            border-left: 5px solid var(--warning-border);
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* ---- Daily Tracker ---- */
+        .tracker-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .tracker-section h2 {
+            font-size: 1.15em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--exercise-bg);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .streak-value { color: var(--streak-gold); }
+        .completed-value { color: var(--green); }
+        .week-value { color: var(--blue); }
+
+        .progress-bar-container {
+            background: var(--progress-bg);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--blue), var(--green));
+            transition: width 0.5s ease;
+            min-width: 0;
+        }
+
+        .today-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--exercise-bg);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .today-banner .today-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .today-banner .today-date {
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        .today-banner .today-workout {
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+
+        .today-banner .today-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.85em;
+            color: #fff;
+        }
+
+        .badge-a { background: var(--blue); }
+        .badge-b { background: var(--green); }
+        .badge-c { background: var(--orange); }
+        .badge-d { background: var(--gray); }
+        .badge-rest { background: #6f42c1; }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .cal-header {
+            text-align: center;
+            font-size: 0.7em;
+            font-weight: bold;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 4px 0;
+        }
+
+        .cal-day {
+            text-align: center;
+            padding: 6px 2px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            background: var(--exercise-bg);
+        }
+
+        .cal-day:hover { opacity: 0.8; }
+        .cal-day.empty { background: transparent; cursor: default; }
+        .cal-day.today { border-color: var(--blue); font-weight: bold; }
+        .cal-day.completed { background: var(--checked-bg); border-color: var(--checked-border); }
+        .cal-day.completed::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: 2px;
+            font-size: 0.6em;
+            color: var(--green);
+            font-weight: bold;
+        }
+        .cal-day.future { opacity: 0.5; cursor: default; }
+        .cal-day .day-num { display: block; font-weight: 600; }
+        .cal-day .day-type {
+            display: block;
+            font-size: 0.6em;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .month-nav button {
+            background: var(--exercise-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 0.85em;
+        }
+
+        .month-nav button:hover { opacity: 0.7; }
+        .month-nav span { font-weight: bold; font-size: 0.95em; }
+
+        /* Workout log */
+        .daily-log {
+            margin-top: 12px;
+        }
+
+        .log-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .log-entry:last-child { border-bottom: none; }
+
+        .log-entry input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--green);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .log-entry label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .log-entry.checked label {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .log-entry .exercise-meta {
+            font-size: 0.75em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.85; }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: var(--exercise-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .notes-area {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9em;
+            resize: vertical;
+            margin-top: 10px;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+
+        /* ---- Calendar Table ---- */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9em;
+        }
+
+        .schedule-table th {
+            background-color: var(--exercise-bg);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---- Workout Sections ---- */
+        .treino-section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .treino-a { border-top: 6px solid var(--blue); }
+        .treino-a h2 { color: var(--blue); }
+        .treino-b { border-top: 6px solid var(--green); }
+        .treino-b h2 { color: var(--green); }
+        .treino-c { border-top: 6px solid var(--orange); }
+        .treino-c h2 { color: var(--orange); }
+        .treino-d { border-top: 6px solid var(--gray); }
+        .treino-d h2 { color: var(--gray); }
+
+        .treino-section h2 {
+            font-size: 1.1em;
+            margin-bottom: 16px;
+        }
+
+        .exercise {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .exercise:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .exercise-img {
+            flex: 0 0 120px;
+            margin-right: 16px;
+            background-color: var(--exercise-bg);
+            text-align: center;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .exercise-img img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .exercise-img span {
+            display: block;
+            padding: 30px 10px;
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .exercise-details h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .series {
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: inline-block;
+            background: var(--exercise-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        ol {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        ol li {
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        /* ---- Tabs ---- */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            gap: 0;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .tab:hover { color: var(--text); }
+        .tab.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ---- History ---- */
+        .history-entry {
+            background: var(--exercise-bg);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .history-entry .he-date { font-weight: bold; font-size: 0.9em; }
+        .history-entry .he-workout { font-size: 0.8em; color: var(--text-muted); }
+        .history-entry .he-status {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .he-done { background: var(--checked-bg); color: var(--green); }
+        .he-partial { background: var(--warning-bg); color: #856404; }
+        .he-missed { background: #f8d7da; color: var(--red); }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 600px) {
+            .exercise {
+                flex-direction: column;
+            }
+            .exercise-img {
+                flex: none;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .calendar-grid {
+                gap: 2px;
+            }
+            .cal-day {
+                padding: 4px 1px;
+                font-size: 0.7em;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Plano de Treinamento - Adaptação e Hipertrofia</h1>
+        <p>Foco: Perda de Peso, Ganho de Massa Muscular, Proteção Lombar (L4) e Joelho (LCA)</p>
+        <div class="date-badge">Início: 05/10/2026</div>
+    </header>
+
+    <div class="warning">
+        <strong>Aviso de Segurança:</strong> Este plano foi desenhado para evitar compressão axial na lombar e proteger o joelho de impactos. Peça sempre ao professor da academia para validar a sua execução no primeiro dia.
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="tabs">
+        <button class="tab active" data-tab="tracker" aria-selected="true">Acompanhamento</button>
+        <button class="tab" data-tab="plan" aria-selected="false">Plano Completo</button>
+        <button class="tab" data-tab="history" aria-selected="false">Histórico</button>
+    </div>
+
+    <!-- ===== TAB: TRACKER ===== -->
+    <div id="tab-tracker" class="tab-content active">
+
+        <div class="tracker-section">
+            <h2>Resumo</h2>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value streak-value" id="stat-streak">0</div>
+                    <div class="stat-label">Dias seguidos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value completed-value" id="stat-completed">0</div>
+                    <div class="stat-label">Treinos feitos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value week-value" id="stat-week">0/6</div>
+                    <div class="stat-label">Esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-rate" style="color:var(--orange)">0%</div>
+                    <div class="stat-label">Taxa mensal</div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+            </div>
+        </div>
+
+        <div class="tracker-section">
+            <h2>Calendário</h2>
+            <div class="month-nav">
+                <button id="prev-month" aria-label="Mês anterior">&larr;</button>
+                <span id="month-label"></span>
+                <button id="next-month" aria-label="Próximo mês">&rarr;</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <div class="cal-header">Seg</div>
+                <div class="cal-header">Ter</div>
+                <div class="cal-header">Qua</div>
+                <div class="cal-header">Qui</div>
+                <div class="cal-header">Sex</div>
+                <div class="cal-header">Sáb</div>
+                <div class="cal-header">Dom</div>
+            </div>
+        </div>
+
+        <div class="tracker-section">
+            <div class="today-banner" id="today-banner">
+                <div class="today-info">
+                    <span class="today-date" id="today-date"></span>
+                    <span class="today-workout" id="today-workout"></span>
+                </div>
+                <span class="today-badge" id="today-badge"></span>
+            </div>
+
+            <div class="daily-log" id="daily-log"></div>
+
+            <label for="daily-notes" class="sr-only">Anotações do dia</label>
+            <textarea id="daily-notes" class="notes-area" placeholder="Anotações do dia (peso usado, sensações, ajustes...)"></textarea>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-save">Salvar progresso</button>
+                <button class="btn btn-secondary" id="btn-complete">Marcar dia completo</button>
+                <button class="btn btn-danger" id="btn-reset">Resetar dia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: PLAN ===== -->
+    <div id="tab-plan" class="tab-content">
+
+        <h2 style="margin-bottom:16px;">Calendário Semanal</h2>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Dia da Semana</th>
+                    <th>Foco do Treino</th>
+                    <th>Módulo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Segunda-feira</td><td>Membros Superiores (Empurrar) + Core</td><td><strong>Treino A</strong></td></tr>
+                <tr><td>Terça-feira</td><td>Membros Superiores (Puxar) + Lombar</td><td><strong>Treino B</strong></td></tr>
+                <tr><td>Quarta-feira</td><td>Membros Inferiores (Seguros para LCA)</td><td><strong>Treino C</strong></td></tr>
+                <tr><td>Quinta-feira</td><td>Gasto Calórico + Funcional Leve</td><td>Treino D</td></tr>
+                <tr><td>Sexta-feira</td><td>Membros Superiores (Empurrar) + Core</td><td><strong>Treino A</strong></td></tr>
+                <tr><td>Sábado</td><td>Membros Superiores (Puxar) + Lombar</td><td><strong>Treino B</strong></td></tr>
+                <tr><td>Domingo</td><td>Descanso Ativo</td><td>Caminhada/Alongamento</td></tr>
+            </tbody>
+        </table>
+
+        <div class="treino-section treino-a">
+            <h2>Treino A: Peito, Ombro, Tríceps e Core</h2>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044393319" alt="Supino em Máquina Articulada">
+                </div>
+                <div class="exercise-details">
+                    <h3>Supino em Máquina Articulada</h3>
+                    <div class="series">3 séries de 12 a 15 repetições</div>
+                    <ol>
+                        <li>Ajuste o banco de modo que os pegadores fiquem alinhados com o meio do seu peito.</li>
+                        <li>Apoie totalmente as costas e, principalmente, a lombar (L4) no encosto. Mantenha os pés firmes no chão.</li>
+                        <li>Empurre o peso à frente estendendo os braços, sem "travar" os cotovelos de forma brusca no final.</li>
+                        <li>Retorne lentamente controlando o peso.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044393237" alt="Crucifixo Voador (Peck Deck)">
+                </div>
+                <div class="exercise-details">
+                    <h3>Crucifixo Voador (Peck Deck)</h3>
+                    <div class="series">3 séries de 12 repetições</div>
+                    <ol>
+                        <li>Ajuste a altura do banco: seus cotovelos e ombros devem formar uma linha reta paralela ao chão.</li>
+                        <li>Encoste as costas no banco mantendo a curvatura natural da coluna.</li>
+                        <li>Feche os braços contraindo o peito e soltando o ar.</li>
+                        <li>Abra os braços de forma controlada.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044392991" alt="Desenvolvimento na Máquina">
+                </div>
+                <div class="exercise-details">
+                    <h3>Desenvolvimento na Máquina</h3>
+                    <div class="series">3 séries de 12 repetições</div>
+                    <ol>
+                        <li>Sente-se e ajuste o banco para que os pegadores fiquem na altura dos ombros.</li>
+                        <li><span class="alert">Regra de ouro:</span> Não empurre o quadril para frente. Sua lombar deve ficar chapada no encosto.</li>
+                        <li>Empurre a carga para cima até os braços ficarem quase retos.</li>
+                        <li>Desça de forma controlada.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044394916" alt="Tríceps no Pulley">
+                </div>
+                <div class="exercise-details">
+                    <h3>Tríceps no Pulley (com Corda)</h3>
+                    <div class="series">3 séries de 15 repetições</div>
+                    <ol>
+                        <li>Fique de pé e contraia o abdômen para blindar a sua coluna.</li>
+                        <li>Segure a corda mantendo os cotovelos "colados" na lateral do corpo.</li>
+                        <li>Empurre a corda para baixo esticando os braços.</li>
+                        <li>Volte devagar sem desgrudar os cotovelos da costela.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044393155" alt="Prancha Abdominal Isométrica">
+                </div>
+                <div class="exercise-details">
+                    <h3>Prancha Abdominal Isométrica</h3>
+                    <div class="series">3 séries de 30 a 45 segundos</div>
+                    <ol>
+                        <li>Deite de bruços no colchonete.</li>
+                        <li>Apoie os antebraços no chão, alinhando os cotovelos abaixo dos ombros.</li>
+                        <li>Eleve o quadril e apoie-se na ponta dos pés.</li>
+                        <li>Puxe o umbigo "para dentro". O corpo deve formar uma prancha reta.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="treino-section treino-b">
+            <h2>Treino B: Costas, Bíceps e Estabilização Lombar</h2>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044393073" alt="Puxada Frontal na Polia Alta">
+                </div>
+                <div class="exercise-details">
+                    <h3>Puxada Frontal na Polia Alta</h3>
+                    <div class="series">3 séries de 12 a 15 repetições</div>
+                    <ol>
+                        <li>Sente-se no aparelho e ajuste o suporte estofado para prender bem as coxas.</li>
+                        <li>Segure a barra em uma largura um pouco maior que os ombros.</li>
+                        <li>Incline o tronco levemente para trás e puxe a barra na direção do peito.</li>
+                        <li>Estique os braços controlando o retorno do peso.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044394998" alt="Remada Máquina com Apoio no Peito">
+                </div>
+                <div class="exercise-details">
+                    <h3>Remada Máquina com Apoio no Peito</h3>
+                    <div class="series">3 séries de 12 repetições</div>
+                    <ol>
+                        <li>Ajuste a altura do banco de modo que o encosto frontal apoie bem no meio do seu peito.</li>
+                        <li>Segure os pegadores com os braços esticados.</li>
+                        <li>Puxe o peso flexionando os cotovelos, juntando as escápulas.</li>
+                        <li>Volte lentamente até esticar os braços.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <span>Sem Imagem</span>
+                </div>
+                <div class="exercise-details">
+                    <h3>Rosca Direta (Polia baixa ou Halteres)</h3>
+                    <div class="series">3 séries de 15 repetições</div>
+                    <ol>
+                        <li>Mantenha a postura ereta e o abdômen contraído.</li>
+                        <li>Flexione os cotovelos levantando o peso.</li>
+                        <li>Não impulsione o corpo para trás usando a lombar.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044392909" alt="Perdigueiro (Bird-Dog)">
+                </div>
+                <div class="exercise-details">
+                    <h3>Perdigueiro (Bird-Dog)</h3>
+                    <div class="series">3 séries de 10 repetições cada lado</div>
+                    <ol>
+                        <li>Posicione-se no chão em quatro apoios.</li>
+                        <li>Contraia o abdômen e mantenha as costas retas.</li>
+                        <li>Levante e estenda o braço direito para frente ao mesmo tempo em que estende a perna esquerda para trás.</li>
+                        <li>Segure a posição no alto por 2 a 3 segundos, retorne e troque os lados.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="treino-section treino-c">
+            <h2>Treino C: Pernas (Proteção do LCA e Lombar)</h2>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044395326" alt="Leg Press Horizontal">
+                </div>
+                <div class="exercise-details">
+                    <h3>Leg Press Horizontal</h3>
+                    <div class="series">3 séries de 15 repetições</div>
+                    <ol>
+                        <li>Sente-se no aparelho e posicione os pés na plataforma na largura dos ombros.</li>
+                        <li>Empurre a plataforma com o calcanhar e a lateral do pé.</li>
+                        <li><span class="alert">Alerta:</span> Ao flexionar os joelhos na volta, desça apenas até as pernas formarem um ângulo de 90 graus para proteger a L4.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044395244" alt="Agachamento Isométrico na Parede">
+                </div>
+                <div class="exercise-details">
+                    <h3>Agachamento Isométrico na Parede (Wall Sit)</h3>
+                    <div class="series">3 séries de 30 a 40 segundos</div>
+                    <ol>
+                        <li>Encoste as costas inteiras em uma parede lisa.</li>
+                        <li>Dê um passo à frente com os dois pés.</li>
+                        <li>Deslize as costas pela parede até que seus joelhos e quadris formem um ângulo de 90 graus.</li>
+                        <li>Fique estático nessa posição respirando de forma ritmada.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044395162" alt="Cadeira Flexora">
+                </div>
+                <div class="exercise-details">
+                    <h3>Cadeira Flexora</h3>
+                    <div class="series">3 séries de 12 repetições</div>
+                    <ol>
+                        <li>Sente-se na máquina e alinhe a dobra do joelho com o eixo giratório da máquina.</li>
+                        <li>Desça a trava superior acolchoada para prender firmemente as coxas.</li>
+                        <li>Faça força empurrando a alavanca para trás e para baixo.</li>
+                        <li>Retorne à posição inicial resistindo ao peso.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="exercise">
+                <div class="exercise-img">
+                    <img src="image_agent_tag_3437170733044395080" alt="Elevação Pélvica">
+                </div>
+                <div class="exercise-details">
+                    <h3>Elevação Pélvica (Solo)</h3>
+                    <div class="series">3 séries de 15 repetições</div>
+                    <ol>
+                        <li>Deite-se de barriga para cima com os joelhos dobrados e pés firmes no chão.</li>
+                        <li>Pressione os calcanhares no chão e eleve o quadril em direção ao teto.</li>
+                        <li>Contraia firmemente os glúteos no alto da subida.</li>
+                        <li>Desça de forma lenta e controlada, tocando o chão levemente.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="treino-section treino-d">
+            <h2>Treino D: Cardio e Funcional (Baixo Impacto)</h2>
+            <div class="exercise" style="border:none;">
+                <div class="exercise-details">
+                    <ol>
+                        <li><strong>Elíptico ou Bicicleta Ergométrica:</strong> 40 a 45 minutos em ritmo moderado. Evite esteira.</li>
+                        <li><strong>Mobilidade de Quadril e Tornozelo:</strong> 10 minutos de alongamentos suaves no colchonete.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: HISTORY ===== -->
+    <div id="tab-history" class="tab-content">
+        <div class="tracker-section">
+            <h2>Histórico de Treinos</h2>
+            <div id="history-list">
+                <div class="empty-state">Nenhum treino registrado ainda. Comece hoje!</div>
+            </div>
+            <div class="btn-group" style="justify-content:flex-end; margin-top:16px;">
+                <button class="btn btn-secondary" id="btn-export">Exportar dados</button>
+                <button class="btn btn-danger" id="btn-clear-all">Limpar tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        var STORAGE_KEY = 'workout_tracker_data';
+        var START_DATE = new Date(2026, 9, 5); // Oct 5, 2026
+
+        var SCHEDULE = {
+            1: { code: 'A', name: 'Peito, Ombro, Tríceps e Core', badge: 'badge-a' },
+            2: { code: 'B', name: 'Costas, Bíceps e Lombar', badge: 'badge-b' },
+            3: { code: 'C', name: 'Pernas (Proteção LCA/Lombar)', badge: 'badge-c' },
+            4: { code: 'D', name: 'Cardio e Funcional', badge: 'badge-d' },
+            5: { code: 'A', name: 'Peito, Ombro, Tríceps e Core', badge: 'badge-a' },
+            6: { code: 'B', name: 'Costas, Bíceps e Lombar', badge: 'badge-b' },
+            0: { code: 'REST', name: 'Descanso Ativo', badge: 'badge-rest' }
+        };
+
+        var EXERCISES = {
+            A: [
+                'Supino em Máquina Articulada — 3x12-15',
+                'Crucifixo Voador (Peck Deck) — 3x12',
+                'Desenvolvimento na Máquina — 3x12',
+                'Tríceps no Pulley (Corda) — 3x15',
+                'Prancha Abdominal Isométrica — 3x30-45s'
+            ],
+            B: [
+                'Puxada Frontal na Polia Alta — 3x12-15',
+                'Remada Máquina com Apoio no Peito — 3x12',
+                'Rosca Direta (Polia/Halteres) — 3x15',
+                'Perdigueiro (Bird-Dog) — 3x10 cada lado'
+            ],
+            C: [
+                'Leg Press Horizontal — 3x15',
+                'Agachamento Isométrico na Parede — 3x30-40s',
+                'Cadeira Flexora — 3x12',
+                'Elevação Pélvica (Solo) — 3x15'
+            ],
+            D: [
+                'Elíptico ou Bicicleta Ergométrica — 40-45 min',
+                'Mobilidade de Quadril e Tornozelo — 10 min'
+            ],
+            REST: [
+                'Caminhada leve — 20-30 min',
+                'Alongamento geral — 10-15 min'
+            ]
+        };
+
+        var MONTHS_PT = [
+            'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+            'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+        ];
+
+        var WEEKDAYS_PT = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+
+        var viewMonth, viewYear;
+
+        function loadData() {
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch(e) { return {}; }
+        }
+
+        function saveData(data) {
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+        }
+
+        function dateKey(d) {
+            return d.getFullYear() + '-' +
+                String(d.getMonth()+1).padStart(2,'0') + '-' +
+                String(d.getDate()).padStart(2,'0');
+        }
+
+        function parseKey(k) {
+            var p = k.split('-');
+            return new Date(+p[0], +p[1]-1, +p[2]);
+        }
+
+        function today() {
+            var n = new Date();
+            return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+        }
+
+        function getWorkout(d) {
+            return SCHEDULE[d.getDay()];
+        }
+
+        function isTrainingDay(d) {
+            return getWorkout(d).code !== 'REST';
+        }
+
+        // ---- Stats ----
+        function computeStats(data) {
+            var t = today();
+            var tk = dateKey(t);
+
+            var streak = 0;
+            var d = new Date(t);
+            while(true) {
+                var k = dateKey(d);
+                var w = getWorkout(d);
+                if (w.code === 'REST') { d.setDate(d.getDate()-1); continue; }
+                if (d > t) break;
+                var entry = data[k];
+                if (entry && entry.completed) {
+                    streak++;
+                    d.setDate(d.getDate()-1);
+                } else if (k === tk) {
+                    d.setDate(d.getDate()-1);
+                } else {
+                    break;
+                }
+            }
+
+            var totalCompleted = 0;
+            Object.keys(data).forEach(function(k) {
+                if (data[k].completed) totalCompleted++;
+            });
+
+            var weekStart = new Date(t);
+            var dayOfWeek = weekStart.getDay();
+            var diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            weekStart.setDate(weekStart.getDate() - diff);
+            var weekDone = 0;
+            for (var i=0; i<7; i++) {
+                var wd = new Date(weekStart);
+                wd.setDate(wd.getDate()+i);
+                var wk = dateKey(wd);
+                if (data[wk] && data[wk].completed) weekDone++;
+            }
+
+            var monthStart = new Date(t.getFullYear(), t.getMonth(), 1);
+            var monthEnd = new Date(t.getFullYear(), t.getMonth()+1, 0);
+            var trainingDays = 0;
+            var doneDays = 0;
+            for (var md = new Date(monthStart); md <= monthEnd && md <= t; md.setDate(md.getDate()+1)) {
+                if (isTrainingDay(md)) {
+                    trainingDays++;
+                    var mk = dateKey(md);
+                    if (data[mk] && data[mk].completed) doneDays++;
+                }
+            }
+            var rate = trainingDays > 0 ? Math.round((doneDays/trainingDays)*100) : 0;
+
+            return { streak: streak, completed: totalCompleted, weekDone: weekDone, rate: rate };
+        }
+
+        function updateStats() {
+            var data = loadData();
+            var s = computeStats(data);
+            document.getElementById('stat-streak').textContent = s.streak;
+            document.getElementById('stat-completed').textContent = s.completed;
+            document.getElementById('stat-week').textContent = s.weekDone + '/6';
+            document.getElementById('stat-rate').textContent = s.rate + '%';
+            document.getElementById('progress-bar').style.width = s.rate + '%';
+        }
+
+        // ---- Calendar ----
+        function renderCalendar() {
+            var data = loadData();
+            var t = today();
+            var grid = document.getElementById('calendar-grid');
+
+            var headers = grid.querySelectorAll('.cal-header');
+            while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+            document.getElementById('month-label').textContent =
+                MONTHS_PT[viewMonth] + ' ' + viewYear;
+
+            var firstDay = new Date(viewYear, viewMonth, 1);
+            var lastDay = new Date(viewYear, viewMonth+1, 0);
+
+            var startDow = firstDay.getDay();
+            var offset = startDow === 0 ? 6 : startDow - 1;
+
+            for (var e=0; e<offset; e++) {
+                var empty = document.createElement('div');
+                empty.className = 'cal-day empty';
+                grid.appendChild(empty);
+            }
+
+            for (var d=1; d<=lastDay.getDate(); d++) {
+                var dt = new Date(viewYear, viewMonth, d);
+                var cell = document.createElement('div');
+                cell.className = 'cal-day';
+                var k = dateKey(dt);
+                var w = getWorkout(dt);
+
+                if (dt.getTime() === t.getTime()) cell.classList.add('today');
+                if (dt > t) cell.classList.add('future');
+                if (data[k] && data[k].completed) cell.classList.add('completed');
+
+                cell.innerHTML = '<span class="day-num">' + d + '</span><span class="day-type">' + w.code + '</span>';
+
+                (function(date) {
+                    cell.addEventListener('click', function() {
+                        if (date > today()) return;
+                        loadDay(date);
+                    });
+                })(dt);
+
+                grid.appendChild(cell);
+            }
+        }
+
+        // ---- Daily Log ----
+        var currentDay = null;
+
+        function loadDay(d) {
+            currentDay = d;
+            var data = loadData();
+            var k = dateKey(d);
+            var entry = data[k] || {};
+            var w = getWorkout(d);
+            var exercises = EXERCISES[w.code] || [];
+
+            document.getElementById('today-date').textContent =
+                WEEKDAYS_PT[d.getDay()] + ', ' + d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
+            document.getElementById('today-workout').textContent =
+                'Treino ' + w.code + ': ' + w.name;
+
+            var badge = document.getElementById('today-badge');
+            badge.textContent = 'Treino ' + w.code;
+            badge.className = 'today-badge ' + w.badge;
+
+            var log = document.getElementById('daily-log');
+            log.innerHTML = '';
+
+            var checked = entry.exercises || {};
+
+            exercises.forEach(function(ex, i) {
+                var div = document.createElement('div');
+                div.className = 'log-entry' + (checked[i] ? ' checked' : '');
+
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 'ex-' + i;
+                cb.checked = !!checked[i];
+                cb.addEventListener('change', function() {
+                    div.classList.toggle('checked', cb.checked);
+                });
+
+                var label = document.createElement('label');
+                label.htmlFor = 'ex-' + i;
+                label.textContent = ex.split(' — ')[0];
+
+                var meta = document.createElement('span');
+                meta.className = 'exercise-meta';
+                meta.textContent = ex.split(' — ')[1] || '';
+
+                div.appendChild(cb);
+                div.appendChild(label);
+                div.appendChild(meta);
+                log.appendChild(div);
+            });
+
+            document.getElementById('daily-notes').value = entry.notes || '';
+        }
+
+        function saveDay(markComplete) {
+            if (!currentDay) return;
+            var data = loadData();
+            var k = dateKey(currentDay);
+            var w = getWorkout(currentDay);
+            var exercises = EXERCISES[w.code] || [];
+
+            var checked = {};
+            exercises.forEach(function(_, i) {
+                var cb = document.getElementById('ex-' + i);
+                if (cb && cb.checked) checked[i] = true;
+            });
+
+            var totalChecked = Object.keys(checked).length;
+
+            data[k] = {
+                exercises: checked,
+                notes: document.getElementById('daily-notes').value,
+                completed: markComplete ? true : (totalChecked === exercises.length),
+                workout: w.code,
+                date: k,
+                totalExercises: exercises.length,
+                doneExercises: totalChecked
+            };
+
+            saveData(data);
+            updateStats();
+            renderCalendar();
+            renderHistory();
+        }
+
+        function resetDay() {
+            if (!currentDay) return;
+            var data = loadData();
+            var k = dateKey(currentDay);
+            delete data[k];
+            saveData(data);
+            loadDay(currentDay);
+            updateStats();
+            renderCalendar();
+            renderHistory();
+        }
+
+        // ---- History ----
+        function renderHistory() {
+            var data = loadData();
+            var list = document.getElementById('history-list');
+            var keys = Object.keys(data).sort().reverse();
+
+            if (keys.length === 0) {
+                list.innerHTML = '<div class="empty-state">Nenhum treino registrado ainda. Comece hoje!</div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            keys.forEach(function(k) {
+                var entry = data[k];
+                var d = parseKey(k);
+                var div = document.createElement('div');
+                div.className = 'history-entry';
+
+                var done = entry.doneExercises || 0;
+                var total = entry.totalExercises || 1;
+                var pct = Math.round((done/total)*100);
+
+                var statusClass = 'he-done';
+                var statusText = 'Completo';
+                if (!entry.completed && pct > 0) {
+                    statusClass = 'he-partial';
+                    statusText = pct + '% feito';
+                } else if (!entry.completed && pct === 0) {
+                    statusClass = 'he-missed';
+                    statusText = 'Não feito';
+                }
+
+                div.innerHTML =
+                    '<div>' +
+                        '<span class="he-date">' + WEEKDAYS_PT[d.getDay()] + ', ' + d.getDate() + '/' + (d.getMonth()+1) + '</span>' +
+                        '<span class="he-workout"> — Treino ' + (entry.workout || '?') + '</span>' +
+                    '</div>' +
+                    '<span class="he-status ' + statusClass + '">' + statusText + '</span>';
+
+                div.style.cursor = 'pointer';
+                (function(date) {
+                    div.addEventListener('click', function() {
+                        document.querySelector('[data-tab="tracker"]').click();
+                        loadDay(date);
+                    });
+                })(d);
+
+                list.appendChild(div);
+            });
+        }
+
+        function exportData() {
+            var data = loadData();
+            var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'workout_data_' + dateKey(today()) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            if (confirm('Tem certeza que deseja apagar TODOS os dados de treino? Esta ação não pode ser desfeita.')) {
+                try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+                loadDay(today());
+                updateStats();
+                renderCalendar();
+                renderHistory();
+            }
+        }
+
+        // ---- Tabs ----
+        document.querySelectorAll('.tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(function(t) {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.tab-content').forEach(function(c) {
+                    c.classList.remove('active');
+                });
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ---- Month nav ----
+        document.getElementById('prev-month').addEventListener('click', function() {
+            viewMonth--;
+            if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+            renderCalendar();
+        });
+
+        document.getElementById('next-month').addEventListener('click', function() {
+            viewMonth++;
+            if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+            renderCalendar();
+        });
+
+        // ---- Buttons ----
+        document.getElementById('btn-save').addEventListener('click', function() { saveDay(false); });
+        document.getElementById('btn-complete').addEventListener('click', function() { saveDay(true); });
+        document.getElementById('btn-reset').addEventListener('click', resetDay);
+        document.getElementById('btn-export').addEventListener('click', exportData);
+        document.getElementById('btn-clear-all').addEventListener('click', clearAll);
+
+        // ---- Init ----
+        var t = today();
+        viewMonth = t.getMonth();
+        viewYear = t.getFullYear();
+
+        loadDay(t);
+        updateStats();
+        renderCalendar();
+        renderHistory();
+    })();
+    </script>
+
+</body>
+</html>
