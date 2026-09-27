@@ -632,7 +632,27 @@
                     <div class="stat-value" id="weight-min" style="color:var(--orange)">--</div>
                     <div class="stat-label">Menor peso</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="weight-bmi" style="color:var(--blue)">--</div>
+                    <div class="stat-label">IMC atual</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="weight-bmi-class" style="font-size:0.85em">--</div>
+                    <div class="stat-label">Classificacao</div>
+                </div>
             </div>
+        </div>
+
+        <div class="tracker-section">
+            <h2>Sua Altura</h2>
+            <div class="weight-input-row">
+                <div class="field">
+                    <label for="height-input">Altura (cm)</label>
+                    <input type="number" id="height-input" step="1" min="100" max="250" placeholder="Ex: 178">
+                </div>
+                <button class="btn btn-primary" id="btn-save-height">Salvar altura</button>
+            </div>
+            <p id="height-saved-msg" style="font-size:0.8em;color:var(--text-muted);margin-top:6px"></p>
         </div>
 
         <div class="tracker-section">
@@ -1026,6 +1046,7 @@
 
         var STORAGE_KEY = 'workout_tracker_data';
         var WEIGHT_KEY = 'workout_weight_data';
+        var HEIGHT_KEY = 'workout_height_cm';
 
         var SCHEDULE = {
             1: { code: 'A', name: 'Peito, Ombro, Triceps e Core', badge: 'badge-a' },
@@ -1228,19 +1249,50 @@
             renderWeightAll();
         }
 
+        function getHeight() { try { var h=localStorage.getItem(HEIGHT_KEY); return h?parseFloat(h):null; } catch(e) { return null; } }
+        function setHeight(cm) { try { localStorage.setItem(HEIGHT_KEY, String(cm)); } catch(e) {} }
+
+        function calcBMI(weightKg, heightCm) {
+            if(!heightCm||heightCm<=0)return null;
+            var hm=heightCm/100;
+            return weightKg/(hm*hm);
+        }
+
+        function bmiClass(bmi) {
+            if(bmi<18.5)return {label:'Abaixo do peso',color:'var(--blue)'};
+            if(bmi<25)return {label:'Peso normal',color:'var(--green)'};
+            if(bmi<30)return {label:'Sobrepeso',color:'var(--orange)'};
+            if(bmi<35)return {label:'Obesidade I',color:'var(--red)'};
+            if(bmi<40)return {label:'Obesidade II',color:'var(--red)'};
+            return {label:'Obesidade III',color:'var(--red)'};
+        }
+
         function renderWeightStats() {
             var weights=loadWeight();
             var cur=document.getElementById('weight-current');
             var start=document.getElementById('weight-start');
             var change=document.getElementById('weight-change');
             var minEl=document.getElementById('weight-min');
-            if(weights.length===0){cur.textContent='--';start.textContent='--';change.textContent='--';minEl.textContent='--';return;}
+            var bmiEl=document.getElementById('weight-bmi');
+            var bmiClassEl=document.getElementById('weight-bmi-class');
+            if(weights.length===0){cur.textContent='--';start.textContent='--';change.textContent='--';minEl.textContent='--';bmiEl.textContent='--';bmiClassEl.textContent='--';return;}
             var first=weights[0].value,last=weights[weights.length-1].value;
             var diff=last-first;var minV=Math.min.apply(null,weights.map(function(w){return w.value;}));
             cur.textContent=last.toFixed(1);start.textContent=first.toFixed(1);
             var sign=diff>0?'+':'';change.textContent=sign+diff.toFixed(1)+' kg';
             change.style.color=diff<0?'var(--green)':diff>0?'var(--red)':'var(--text-muted)';
             minEl.textContent=minV.toFixed(1);
+            var h=getHeight();
+            var bmi=calcBMI(last,h);
+            if(bmi){
+                bmiEl.textContent=bmi.toFixed(1);
+                var cls=bmiClass(bmi);
+                bmiClassEl.textContent=cls.label;
+                bmiClassEl.style.color=cls.color;
+                bmiEl.style.color=cls.color;
+            } else {
+                bmiEl.textContent='--';bmiClassEl.textContent='Informe sua altura';bmiClassEl.style.color='var(--text-muted)';
+            }
         }
 
         function renderWeightChart() {
@@ -1365,10 +1417,19 @@
         document.getElementById('btn-export').addEventListener('click',exportData);
         document.getElementById('btn-clear-all').addEventListener('click',clearAll);
         document.getElementById('btn-add-weight').addEventListener('click',addWeight);
+        document.getElementById('btn-save-height').addEventListener('click',function(){
+            var val=parseFloat(document.getElementById('height-input').value);
+            if(isNaN(val)||val<100||val>250)return;
+            setHeight(val);
+            document.getElementById('height-saved-msg').textContent='Altura salva: '+val+' cm';
+            renderWeightStats();
+        });
 
         // Init
         var t=today();viewMonth=t.getMonth();viewYear=t.getFullYear();
         document.getElementById('weight-date-input').value=dateKey(t);
+        var savedHeight=getHeight();
+        if(savedHeight){document.getElementById('height-input').value=savedHeight;document.getElementById('height-saved-msg').textContent='Altura salva: '+savedHeight+' cm';}
         loadDay(t);updateStats();renderCalendar();renderHistory();renderWeightAll();
 
         window.addEventListener('resize',function(){
